@@ -1,4 +1,4 @@
-package com.capstone.frutify.ui.auth.login
+package com.capstone.frutify.ui.auth.register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,15 +39,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     onSignUp: () -> Unit,
     onLogin: () -> Unit
 ) {
 
+    var nameInput by remember {
+        mutableStateOf("")
+    }
     var emailInput by remember {
         mutableStateOf("")
     }
@@ -65,7 +69,7 @@ fun LoginScreen(
             .background(Color(0xFF5BB85B))
     ) {
         Text(
-            text = "Sign in to your Account",
+            text = "Register",
             color = Color.White,
             fontWeight = FontWeight.Bold,
             fontSize = 30.sp,
@@ -78,7 +82,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "Sign in to your Account",
+            text = "Create your account",
             color = Color.White,
             fontWeight = FontWeight.Light,
             fontSize = 20.sp,
@@ -101,6 +105,52 @@ fun LoginScreen(
                     .fillMaxSize()
                     .padding(start = 16.dp, end = 16.dp, top = 40.dp)
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Full Name",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = nameInput,
+                        onValueChange = {
+                            nameInput = it
+                        },
+                        placeholder = {
+                            Text(
+                                text = "fendinand sinaga",
+                                fontSize = 14.sp
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF333333),
+                            unfocusedBorderColor = Color(0xFF333333),
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedPlaceholderColor = Color(0xFF666666),
+                            unfocusedPlaceholderColor = Color(0xFF666666)
+                        ),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.None
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                            }
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -221,7 +271,7 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        onLogin()
+                        onSignUp()
                     },
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -233,7 +283,7 @@ fun LoginScreen(
                         .height(60.dp)
                 ) {
                     Text(
-                        text = "Login",
+                        text = "Register",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -248,24 +298,33 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.Center
                 ){
                     Text(
-                        text = "Don't have an account?",
+                        text = "Already have an account?",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Light,
                         color = Color(0xFF333333)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = "Sign up",
+                        text = "Login",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF5BB85B),
                         modifier = Modifier
                             .clickable {
-                                onSignUp()
+                                onLogin()
                             }
                     )
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun RegisterScreenPreview() {
+    RegisterScreen(
+        onSignUp = {},
+        onLogin = {}
+    )
 }
