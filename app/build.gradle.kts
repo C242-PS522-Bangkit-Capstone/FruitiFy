@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("androidx.compose.material:material-icons-core:1.7.5")
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
+    implementation(libs.androidx.paging.common.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

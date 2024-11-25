@@ -13,14 +13,8 @@
         android:theme="@style/Theme.Frutify"
         tools:targetApi="31">
         <activity
-            android:name=".ui.auth.register.RegisterActivity"
-            android:exported="false"
-            android:label="@string/title_activity_register"
-            android:theme="@style/Theme.Frutify" />
-        <activity
-            android:name=".ui.auth.login.LoginActivity"
+            android:name=".ui.onboarding.OnboardingActivity"
             android:exported="true"
-            android:label="@string/title_activity_login"
             android:theme="@style/Theme.Frutify">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,9 +23,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.auth.register.RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Frutify" />
+        <activity
+            android:name=".ui.auth.login.LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Frutify"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="MainActivity"
             android:theme="@style/Theme.Frutify" />
     </application>
 
