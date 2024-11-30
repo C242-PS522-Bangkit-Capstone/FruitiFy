@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.capstone.frutify.ui.history.DetailScreen
 import com.capstone.frutify.ui.home.component.HomeScreenHeader
 import com.capstone.frutify.ui.home.component.QuickScanOption
 import com.capstone.frutify.ui.home.component.RecentData
@@ -29,7 +30,8 @@ import com.capstone.frutify.ui.home.scan.SuccessScreen
 
 @Composable
 fun HomeScreen(
-    onFruitSelected: (String) -> Unit
+    onFruitSelected: (String) -> Unit,
+    onClickedetail: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -57,7 +59,11 @@ fun HomeScreen(
                     }
                 )
                 Spacer(modifier = Modifier.height(30.dp))
-                RecentData()
+                RecentData(
+                    onClickDetail = {
+                        onClickedetail()
+                    }
+                )
             }
         }
     }
@@ -69,9 +75,25 @@ fun HomeScreenNavHost() {
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
-            HomeScreen { fruitName ->
-                navController.navigate("scan/$fruitName")
-            }
+            HomeScreen(
+                onFruitSelected = { fruitName ->
+                    navController.navigate("scan/$fruitName")
+                },
+                onClickedetail = {
+                    navController.navigate("detail/{}")
+                }
+            )
+        }
+        composable("detail") {
+            DetailScreen(
+                image = "",
+                title = "",
+                date = "",
+                weight = 0.0,
+                onBackClicked = {
+                    navController.popBackStack(route = "home", inclusive = false)
+                }
+            )
         }
         composable(
             "scan/{fruitName}",

@@ -1,5 +1,6 @@
 package com.capstone.frutify.ui.home.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +43,9 @@ data class FruitData(
 )
 
 @Composable
-fun RecentData() {
+fun RecentData(
+    onClickDetail: (FruitData) -> Unit
+) {
 
     val listData = listOf(
         FruitData(
@@ -87,7 +91,7 @@ fun RecentData() {
             color = Color(0xFF333333)
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -97,7 +101,10 @@ fun RecentData() {
                     image = it.image,
                     title = it.title,
                     date = it.date,
-                    weight = it.weight
+                    weight = it.weight,
+                    onClickDetail = {
+                        onClickDetail(it)
+                    }
                 )
             }
         }
@@ -110,12 +117,19 @@ fun RecentDataCard(
     image: String,
     title: String,
     date: String,
-    weight: Double
+    weight: Double,
+    onClickDetail: () -> Unit
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
+            .clickable {
+                onClickDetail()
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF5F5F5)
+        )
     ) {
         Row(
             modifier = Modifier

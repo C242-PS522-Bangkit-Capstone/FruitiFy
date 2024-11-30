@@ -52,7 +52,7 @@ fun ResultScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .padding(start= 16.dp,end=16.dp, top = 50.dp, bottom = 30.dp),
+                    .padding(start= 16.dp,end=16.dp, top = 40.dp, bottom = 30.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
