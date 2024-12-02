@@ -27,10 +27,16 @@ fun Auth(
         composable("signup") {
             RegisterScreen(
                 onSignUp = {
-                    navController.popBackStack()
+                    navController.popBackStack(
+                        route = "signup",
+                        inclusive = false
+                    )
                 },
                 onLogin = {
-                    navController.popBackStack()
+                    navController.popBackStack(
+                        route = "login",
+                        inclusive = false
+                    )
                 }
             )
         }

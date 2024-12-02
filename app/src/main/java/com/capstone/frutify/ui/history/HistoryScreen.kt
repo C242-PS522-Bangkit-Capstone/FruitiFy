@@ -68,7 +68,7 @@ fun HistoryNavHost() {
                 date = date,
                 weight = weight.toDouble(),
                 onBackClicked = {
-                    navController.popBackStack()
+                    navController.popBackStack(route = "history_screen", inclusive = false)
                 }
             )
         }

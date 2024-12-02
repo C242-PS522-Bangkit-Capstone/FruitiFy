@@ -1,4 +1,4 @@
-package com.capstone.frutify.ui.home.scan
+package com.capstone.frutify.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +30,7 @@ import com.capstone.frutify.R
 @Composable
 fun SuccessScreen(
     onBackClicked: () -> Unit,
+    title: String,
 ) {
     Column(
         modifier = Modifier
@@ -48,7 +49,7 @@ fun SuccessScreen(
         Spacer(modifier = Modifier.height(50.dp))
 
         Text(
-            text = "Data Successfully Saved",
+            text = title,
             color = Color(0xFF333333),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -80,12 +81,11 @@ fun SuccessScreen(
                 color = Color.White
             )
         }
-
     }
 }
 
 @Preview
 @Composable
 fun SuccessScreenPreview() {
-    SuccessScreen(onBackClicked = {})
+    SuccessScreen(onBackClicked = {}, title = "Data Successfully Saved")
 }

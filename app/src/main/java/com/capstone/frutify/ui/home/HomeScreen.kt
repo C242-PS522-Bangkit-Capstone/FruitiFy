@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.capstone.frutify.ui.SuccessScreen
 import com.capstone.frutify.ui.history.DetailScreen
 import com.capstone.frutify.ui.home.component.HomeScreenHeader
 import com.capstone.frutify.ui.home.component.QuickScanOption
@@ -26,7 +27,6 @@ import com.capstone.frutify.ui.home.component.RecentData
 import com.capstone.frutify.ui.home.scan.ResultScreen
 import com.capstone.frutify.ui.home.scan.SaveScanResult
 import com.capstone.frutify.ui.home.scan.ScanScreen
-import com.capstone.frutify.ui.home.scan.SuccessScreen
 
 @Composable
 fun HomeScreen(
@@ -130,15 +130,16 @@ fun HomeScreenNavHost() {
                     navController.popBackStack()
                 },
                 onSaveResult = {
-                    navController.navigate("success_screen")
+                    navController.navigate("success_screen_scan")
                 }
             )
         }
-        composable(route = "success_screen"){
+        composable(route = "success_screen_scan"){
             SuccessScreen(
                 onBackClicked = {
                     navController.popBackStack(route = "home", inclusive = false)
-                }
+                },
+                title = "Data Successfully Saved"
             )
         }
     }

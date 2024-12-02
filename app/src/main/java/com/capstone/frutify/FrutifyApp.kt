@@ -5,8 +5,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.frutify.ui.auth.Auth
+import com.capstone.frutify.ui.history.HistoryNavHost
 import com.capstone.frutify.ui.home.HomeScreenNavHost
 import com.capstone.frutify.ui.onboarding.OnboardingScreen
+import com.capstone.frutify.ui.setting.SettingNavHost
 
 @Composable
 fun FruitifyApp() {
@@ -31,6 +33,12 @@ fun FruitifyApp() {
         }
         composable("home") {
             HomeScreenNavHost()
+        }
+        composable("history") {
+            HistoryNavHost()
+        }
+        composable("setting") {
+            SettingNavHost()
         }
     }
 }
