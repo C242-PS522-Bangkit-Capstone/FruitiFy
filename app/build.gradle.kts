@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        mlModelBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -70,6 +71,8 @@ dependencies {
     implementation("androidx.camera:camera-view:1.4.0")
     implementation("com.google.accompanist:accompanist-permissions:0.33.0-alpha")
     implementation(libs.androidx.paging.common.android)
+    implementation(libs.tensorflow.lite.support)
+    implementation(libs.tensorflow.lite.metadata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

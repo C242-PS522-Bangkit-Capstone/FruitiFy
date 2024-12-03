@@ -83,6 +83,7 @@ fun RecentData(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = 16.dp)
     ) {
         Text(
             text = "Recent Data",

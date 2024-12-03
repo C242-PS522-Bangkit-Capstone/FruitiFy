@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.capstone.frutify.ui.SuccessScreen
 import com.capstone.frutify.ui.history.DetailScreen
+import com.capstone.frutify.ui.home.component.FruitData
 import com.capstone.frutify.ui.home.component.HomeScreenHeader
 import com.capstone.frutify.ui.home.component.QuickScanOption
 import com.capstone.frutify.ui.home.component.RecentData
@@ -31,8 +32,9 @@ import com.capstone.frutify.ui.home.scan.ScanScreen
 @Composable
 fun HomeScreen(
     onFruitSelected: (String) -> Unit,
-    onClickedetail: () -> Unit
+    onClickDetail: (FruitData) -> Unit
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,7 +48,6 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(Color.White)
-                .padding(bottom = 80.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -54,14 +55,14 @@ fun HomeScreen(
                     .padding(start = 16.dp, end = 16.dp, top = 40.dp)
             ) {
                 QuickScanOption(
-                    onScan = { fruitName -> // Terima nama buah yang dipilih
-                        onFruitSelected(fruitName) // Panggil onFruitSelected dengan fruitName
+                    onScan = { fruitName ->
+                        onFruitSelected(fruitName)
                     }
                 )
                 Spacer(modifier = Modifier.height(30.dp))
                 RecentData(
-                    onClickDetail = {
-                        onClickedetail()
+                    onClickDetail = { item ->
+                        onClickDetail(item)
                     }
                 )
             }
@@ -79,17 +80,32 @@ fun HomeScreenNavHost() {
                 onFruitSelected = { fruitName ->
                     navController.navigate("scan/$fruitName")
                 },
-                onClickedetail = {
-                    navController.navigate("detail/{}")
+                onClickDetail = { item ->
+                    navController.navigate(
+                        "detail_screen?image=${item.image}&title=${item.title}&date=${item.date}&weight=${item.weight}"
+                    )
                 }
             )
         }
-        composable("detail") {
+        composable(
+            route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}",
+            arguments = listOf(
+                navArgument("image") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType },
+                navArgument("date") { type = NavType.StringType },
+                navArgument("weight") { type = NavType.FloatType }
+            )
+        ) { backStackEntry ->
+            val image = backStackEntry.arguments?.getString("image") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val date = backStackEntry.arguments?.getString("date") ?: ""
+            val weight = backStackEntry.arguments?.getFloat("weight") ?: 0.0f
+
             DetailScreen(
-                image = "",
-                title = "",
-                date = "",
-                weight = 0.0,
+                image = image,
+                title = title,
+                date = date,
+                weight = weight.toDouble(),
                 onBackClicked = {
                     navController.popBackStack(route = "home", inclusive = false)
                 }

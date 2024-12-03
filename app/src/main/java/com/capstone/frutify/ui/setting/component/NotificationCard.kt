@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -41,14 +41,14 @@ fun NotificationCard() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                Icons.Rounded.Person,
+                Icons.Rounded.NotificationsActive,
                 contentDescription = "",
                 tint = Color(0xFF333333),
                 modifier = Modifier
                     .size(30.dp)
             )
             Text(
-                text = "Personal Information",
+                text = "Notification",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF333333)
