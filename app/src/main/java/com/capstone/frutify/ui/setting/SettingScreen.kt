@@ -67,55 +67,7 @@ fun SettingNavHost() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "setting_screen") {
-        composable("setting_screen") {
-            SettingScreen(
-                onClickPersonalInformation = {
-                    navController.navigate("personal_information_screen")
-                },
-                onClickChangePassword = {
-                    navController.navigate("change_password_screen")
-                },
-                onClickLanguage = {
-                    navController.navigate("language_screen")
-                },
-                onClickDeleteAccount = {
-                    navController.navigate("delete_account_screen")
-                }
-            )
-        }
-        composable("personal_information_screen") {
-            PersonalInformationScreen {
-                navController.popBackStack(route = "setting_screen", inclusive = false)
-            }
-        }
-        composable("change_password_screen") {
-            ChangePasswordScreen {
-                navController.popBackStack(route = "setting_screen", inclusive = false)
-            }
-        }
-        composable("language_screen") {
-            LanguageScreen {
-                navController.popBackStack(route = "setting_screen", inclusive = false)
-            }
-        }
-        composable("delete_account_screen") {
-            DeleteAccountScreen(
-                onClickBack = {
-                    navController.popBackStack(route = "setting_screen", inclusive = false)
-                },
-                onClickDelete = {
-                    navController.navigate("success_screen_setting")
-                }
-            )
-        }
-        composable("success_screen_setting") {
-            SuccessScreen(
-                onBackClicked = {
-                    navController.popBackStack(route = "onboarding", inclusive = false)
-                },
-                title = "Account Successfully Delete"
-            )
-        }
+
     }
 }
 

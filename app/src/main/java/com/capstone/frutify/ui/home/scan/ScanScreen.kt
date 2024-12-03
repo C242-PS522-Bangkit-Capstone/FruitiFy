@@ -6,6 +6,7 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,8 +43,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.capstone.frutify.ui.home.scan.component.CameraPreview
+import com.capstone.frutify.utils.FruitClassifierHelper
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -64,6 +67,8 @@ fun ScanScreen(
     // Menyimpan hasil scan dan uri gambar
     val scanResult = remember { mutableStateOf("") }
     val imageUri = remember { mutableStateOf<String?>(null) }
+
+    val imageCapture = remember { ImageCapture.Builder().build() }
 
     Scaffold(
         topBar = {
@@ -123,13 +128,14 @@ fun ScanScreen(
                         onUseCamera = { previewView, cameraProvider ->
                             val preview = Preview.Builder().build()
                             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-                            preview.setSurfaceProvider(previewView.surfaceProvider)
+                            preview.surfaceProvider = previewView.surfaceProvider
                             try {
                                 cameraProvider.unbindAll()
                                 cameraProvider.bindToLifecycle(
                                     lifecycleOwner,
                                     cameraSelector,
-                                    preview
+                                    preview,
+                                    imageCapture
                                 )
                             } catch (e: Exception) {
                                 Toast.makeText(context, "Failed to start camera: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -150,10 +156,26 @@ fun ScanScreen(
                         )
                         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-                        val uri = Uri.fromFile(photoFile).toString()
-                        val result = "Fresh" // Simulasi hasil scan
+                        imageCapture.takePicture(
+                            outputOptions,
+                            ContextCompat.getMainExecutor(context),
+                            object : ImageCapture.OnImageSavedCallback {
+                                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                                    val uri = Uri.fromFile(photoFile)
+                                    val result = FruitClassifierHelper(context).classifyFruit(uri)
+                                    result?.let { (label, confidence) ->
+                                        Toast.makeText(context, "Result: $label with confidence: $confidence", Toast.LENGTH_SHORT).show()
+                                        onScanCompleted(label, uri.toString())
+                                    } ?: run {
+                                        Toast.makeText(context, "Failed to classify image", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
 
-                        onScanCompleted(result, uri)
+                                override fun onError(exception: ImageCaptureException) {
+                                    Toast.makeText(context, "Image capture failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        )
                     },
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(

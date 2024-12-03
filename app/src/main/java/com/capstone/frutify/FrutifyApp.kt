@@ -1,5 +1,6 @@
 package com.capstone.frutify
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -21,15 +22,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navigation
+import com.capstone.frutify.ui.SuccessScreen
 import com.capstone.frutify.ui.auth.Auth
-import com.capstone.frutify.ui.history.HistoryNavHost
-import com.capstone.frutify.ui.home.HomeScreenNavHost
+import com.capstone.frutify.ui.history.DetailScreen
+import com.capstone.frutify.ui.history.HistoryScreen
+import com.capstone.frutify.ui.home.HomeScreen
+import com.capstone.frutify.ui.home.scan.ResultScreen
+import com.capstone.frutify.ui.home.scan.SaveScanResult
+import com.capstone.frutify.ui.home.scan.ScanScreen
 import com.capstone.frutify.ui.onboarding.OnboardingScreen
-import com.capstone.frutify.ui.setting.SettingNavHost
+import com.capstone.frutify.ui.setting.ChangePasswordScreen
+import com.capstone.frutify.ui.setting.DeleteAccountScreen
+import com.capstone.frutify.ui.setting.LanguageScreen
+import com.capstone.frutify.ui.setting.PersonalInformationScreen
+import com.capstone.frutify.ui.setting.SettingScreen
 
 @Composable
 fun FruitifyApp() {
@@ -37,7 +50,10 @@ fun FruitifyApp() {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
+    Log.d("Navigation", "Current route: $currentRoute")
+
     val showBottomBar = currentRoute in listOf("home", "history", "setting")
+
     val startDestination = "onboarding"
 
     Scaffold(
@@ -53,28 +69,203 @@ fun FruitifyApp() {
             modifier = Modifier
                 .padding(innerPadding)
         ) {
+
+            // Onboarding Screen
             composable("onboarding") {
                 OnboardingScreen(
                     onClickStarted = {
-                        navController.navigate("login")
+                        navController.navigate("auth")
                     }
                 )
             }
-            composable("login") {
+
+            // Auth Screen
+            composable("auth") {
                 Auth(
                     onLogin = {
-                        navController.navigate("home")
+                        navController.navigate("home_screen")
                     }
                 )
             }
-            composable("home") {
-                HomeScreenNavHost()
+
+            // Home Screen
+            navigation(startDestination = "home", route = "home_screen") {
+                composable("home") {
+                    HomeScreen(
+                        onFruitSelected = { fruitName ->
+                            navController.navigate("scan/$fruitName")
+                        },
+                        onClickDetail = { item ->
+                            navController.navigate(
+                                "detail_screen?image=${item.image}&title=${item.title}&date=${item.date}&weight=${item.weight}"
+                            )
+                        }
+                    )
+                }
+                composable(
+                    route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}",
+                    arguments = listOf(
+                        navArgument("image") { type = NavType.StringType },
+                        navArgument("title") { type = NavType.StringType },
+                        navArgument("date") { type = NavType.StringType },
+                        navArgument("weight") { type = NavType.FloatType }
+                    )
+                ) { backStackEntry ->
+                    val image = backStackEntry.arguments?.getString("image") ?: ""
+                    val title = backStackEntry.arguments?.getString("title") ?: ""
+                    val date = backStackEntry.arguments?.getString("date") ?: ""
+                    val weight = backStackEntry.arguments?.getFloat("weight") ?: 0.0f
+
+                    DetailScreen(
+                        image = image,
+                        title = title,
+                        date = date,
+                        weight = weight.toDouble(),
+                        onBackClicked = {
+                            navController.popBackStack(route = "home", inclusive = false)
+                        }
+                    )
+                }
+                composable(
+                    "scan/{fruitName}",
+                    arguments = listOf(
+                        navArgument("fruitName") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val fruitName = backStackEntry.arguments?.getString("fruitName") ?: "Unknown"
+                    ScanScreen(
+                        fruitName = fruitName,
+                        onBackClicked = {
+                            navController.popBackStack(
+                                route = "home",
+                                inclusive = false
+                            )
+                        },
+                        onScanCompleted = { scanResult, imageUri ->
+                            navController.navigate("result_screen")
+                        }
+                    )
+                }
+                composable(route = "result_screen") {
+                    ResultScreen(
+                        imageUri = "",
+                        scanResult = "",
+                        onBackClicked = {
+                            navController.popBackStack()
+                        },
+                        saveResult = {
+                            navController.navigate("save_result_screen")
+                        }
+                    )
+                }
+                composable(route = "save_result_screen") {
+                    SaveScanResult(
+                        onBackClicked = {
+                            navController.popBackStack()
+                        },
+                        onSaveResult = {
+                            navController.navigate("success_screen_scan")
+                        }
+                    )
+                }
+                composable(route = "success_screen_scan") {
+                    SuccessScreen(
+                        onBackClicked = {
+                            navController.popBackStack(route = "home", inclusive = false)
+                        },
+                        title = "Data Successfully Saved"
+                    )
+                }
             }
-            composable("history") {
-                HistoryNavHost()
+
+            // History Screen
+            navigation(startDestination = "history", route = "history_screen"){
+                composable("history") {
+                    HistoryScreen(
+                        onClickDetail = { item ->
+                            navController.navigate(
+                                "detail_screen?image=${item.image}&title=${item.title}&date=${item.date}&weight=${item.weight}"
+                            )
+                        }
+                    )
+                }
+                composable(
+                    route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}",
+                    arguments = listOf(
+                        navArgument("image") { type = NavType.StringType },
+                        navArgument("title") { type = NavType.StringType },
+                        navArgument("date") { type = NavType.StringType },
+                        navArgument("weight") { type = NavType.FloatType }
+                    )
+                ) { backStackEntry ->
+                    val image = backStackEntry.arguments?.getString("image") ?: ""
+                    val title = backStackEntry.arguments?.getString("title") ?: ""
+                    val date = backStackEntry.arguments?.getString("date") ?: ""
+                    val weight = backStackEntry.arguments?.getFloat("weight") ?: 0.0f
+
+                    DetailScreen(
+                        image = image,
+                        title = title,
+                        date = date,
+                        weight = weight.toDouble(),
+                        onBackClicked = {
+                            navController.popBackStack(route = "history", inclusive = false)
+                        }
+                    )
+                }
             }
-            composable("setting") {
-                SettingNavHost()
+
+            // Setting Screen
+            navigation(startDestination = "setting", route = "setting_screen"){
+                composable("setting") {
+                    SettingScreen(
+                        onClickPersonalInformation = {
+                            navController.navigate("personal_information_screen")
+                        },
+                        onClickChangePassword = {
+                            navController.navigate("change_password_screen")
+                        },
+                        onClickLanguage = {
+                            navController.navigate("language_screen")
+                        },
+                        onClickDeleteAccount = {
+                            navController.navigate("delete_account_screen")
+                        }
+                    )
+                }
+                composable("personal_information_screen") {
+                    PersonalInformationScreen {
+                        navController.popBackStack(route = "setting", inclusive = false)
+                    }
+                }
+                composable("change_password_screen") {
+                    ChangePasswordScreen {
+                        navController.popBackStack(route = "setting", inclusive = false)
+                    }
+                }
+                composable("language_screen") {
+                    LanguageScreen {
+                        navController.popBackStack(route = "setting", inclusive = false)
+                    }
+                }
+                composable("delete_account_screen") {
+                    DeleteAccountScreen(
+                        onClickBack = {
+                            navController.popBackStack(route = "setting", inclusive = false)
+                        },
+                        onClickDelete = {
+                            navController.navigate("success_screen_setting")
+                        }
+                    )
+                }
+                composable("success_screen_setting") {
+                    SuccessScreen(
+                        onBackClicked = {
+                            navController.popBackStack(route = "onboarding", inclusive = false)
+                        },
+                        title = "Account Successfully Delete"
+                    )
+                }
             }
         }
     }
