@@ -34,17 +34,9 @@ fun HistoryScreen(
     }
 }
 
-@Composable
-fun HistoryNavHost() {
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "history_screen") {
-
-    }
-}
 
 @Preview
 @Composable
 fun HistoryScreenPreview() {
-    HistoryNavHost()
+
 }

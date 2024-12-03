@@ -11,10 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.capstone.frutify.ui.SuccessScreen
 import com.capstone.frutify.ui.setting.component.ChangePasswordCard
 import com.capstone.frutify.ui.setting.component.DeleteAccountCard
 import com.capstone.frutify.ui.setting.component.LanguageCard
@@ -62,17 +58,14 @@ fun SettingScreen(
     }
 }
 
-@Composable
-fun SettingNavHost() {
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "setting_screen") {
-
-    }
-}
 
 @Preview
 @Composable
 fun SettingScreenPreview() {
-    SettingNavHost()
+    SettingScreen(
+        onClickPersonalInformation = { /*TODO*/ },
+        onClickChangePassword = { /*TODO*/ },
+        onClickLanguage = { /*TODO*/ },
+        onClickDeleteAccount = { /*TODO*/ }
+    )
 }
