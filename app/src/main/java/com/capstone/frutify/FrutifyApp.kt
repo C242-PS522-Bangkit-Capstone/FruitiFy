@@ -1,5 +1,6 @@
 package com.capstone.frutify
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -142,29 +143,49 @@ fun FruitifyApp() {
                             )
                         },
                         onScanCompleted = { scanResult, imageUri ->
-                            navController.navigate("result_screen")
+                            navController.navigate("result_screen/$scanResult/${Uri.encode(imageUri)}")
                         }
                     )
                 }
-                composable(route = "result_screen") {
+                composable(
+                    "result_screen/{scanResult}/{imageUri}",
+                    arguments = listOf(
+                        navArgument("scanResult") { type = NavType.StringType },
+                        navArgument("imageUri") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val scanResult = backStackEntry.arguments?.getString("scanResult") ?: "Unknown"
+                    val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
+
                     ResultScreen(
-                        imageUri = "",
-                        scanResult = "",
+                        imageUri = imageUri,
+                        scanResult = scanResult,
                         onBackClicked = {
                             navController.popBackStack()
                         },
                         saveResult = {
-                            navController.navigate("save_result_screen")
+                            navController.navigate("save_result_screen/$scanResult/${Uri.encode(imageUri)}")
                         }
                     )
                 }
-                composable(route = "save_result_screen") {
+                composable(
+                    "save_result_screen/{scanResult}/{imageUri}",
+                    arguments = listOf(
+                        navArgument("scanResult") { type = NavType.StringType },
+                        navArgument("imageUri") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val scanResult = backStackEntry.arguments?.getString("scanResult") ?: "Unknown"
+                    val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
+
                     SaveScanResult(
+                        scanResult = scanResult,
+                        imageUri = imageUri,
                         onBackClicked = {
                             navController.popBackStack()
                         },
                         onSaveResult = {
-                            navController.navigate("success_screen_scan")
+                            // Implementasi untuk menyimpan hasil
                         }
                     )
                 }

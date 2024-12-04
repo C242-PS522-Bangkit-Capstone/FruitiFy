@@ -1,5 +1,7 @@
 package com.capstone.frutify.ui.home.scan
 
+import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +18,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,7 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +51,8 @@ import com.capstone.frutify.R
 
 @Composable
 fun SaveScanResult(
+    scanResult: String,
+    imageUri: String,
     onBackClicked: () -> Unit,
     onSaveResult: () -> Unit
 ){
@@ -100,9 +109,9 @@ fun SaveScanResult(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(25.dp)
         ) {
+            // Tampilkan gambar
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -112,12 +121,79 @@ fun SaveScanResult(
                     color = Color(0xFF333333)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.tomato),
-                    contentDescription = "image",
+                val imageBitmap = remember(imageUri) {
+                    BitmapFactory.decodeFile(Uri.parse(imageUri).path)
+                }
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap.asImageBitmap(),
+                        contentDescription = "Scanned Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.FillBounds
+                    )
+                } else {
+                    Text(
+                        text = "Image not available",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF666666)
+                    )
+                }
+            }
+
+            // Tampilkan hasil analisis
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Analysis Result",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF333333)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = scanResult,
+                    onValueChange = {},
+                    placeholder = {
+                        Text(
+                            text = scanResult,
+                            fontSize = 14.sp
+                        )
+                    },
+                    readOnly = true,
+                    leadingIcon = {
+                        Icon(
+                            Icons.Rounded.Check,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(25.dp),
+                            tint = Color(0xFF666666)
+                        )
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF333333),
+                        unfocusedBorderColor = Color(0xFF333333),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        focusedPlaceholderColor = Color(0xFF666666),
+                        unfocusedPlaceholderColor = Color(0xFF666666)
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboardController?.hide()
+                        }
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
                 )
             }
 
@@ -162,7 +238,7 @@ fun SaveScanResult(
                         unfocusedPlaceholderColor = Color(0xFF666666)
                     ),
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.None
+                        imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
@@ -199,10 +275,11 @@ fun SaveScanResult(
                     },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.weight),
+                            Icons.Rounded.CalendarMonth,
                             contentDescription = null,
                             modifier = Modifier
-                                .size(25.dp)
+                                .size(25.dp),
+                            tint = Color(0xFF666666)
                         )
                     },
                     shape = RoundedCornerShape(10.dp),
@@ -215,7 +292,7 @@ fun SaveScanResult(
                         unfocusedPlaceholderColor = Color(0xFF666666)
                     ),
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.None
+                        imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
@@ -254,6 +331,5 @@ fun SaveScanResult(
 @Preview
 @Composable
 fun SaveScanResultPreview(){
-    SaveScanResult(onBackClicked = {}, onSaveResult = {})
-
+    SaveScanResult(onBackClicked = {}, onSaveResult = {}, scanResult = "", imageUri = "")
 }

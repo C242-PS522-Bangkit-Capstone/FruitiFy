@@ -3,6 +3,7 @@ package com.capstone.frutify.ui.home.scan
 import android.Manifest
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -63,10 +64,6 @@ fun ScanScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var isPermissionGranted by remember { mutableStateOf(false) }
-
-    // Menyimpan hasil scan dan uri gambar
-    val scanResult = remember { mutableStateOf("") }
-    val imageUri = remember { mutableStateOf<String?>(null) }
 
     val imageCapture = remember { ImageCapture.Builder().build() }
 
@@ -162,9 +159,9 @@ fun ScanScreen(
                             object : ImageCapture.OnImageSavedCallback {
                                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                                     val uri = Uri.fromFile(photoFile)
-                                    val result = FruitClassifierHelper(context).classifyFruit(uri)
+                                    val result = FruitClassifierHelper(context).classifyFruit(uri, fruitName)
                                     result?.let { (label, confidence) ->
-                                        Toast.makeText(context, "Result: $label with confidence: $confidence", Toast.LENGTH_SHORT).show()
+                                        Log.d("Scan Screen", "Result: $label with confidence: $confidence")
                                         onScanCompleted(label, uri.toString())
                                     } ?: run {
                                         Toast.makeText(context, "Failed to classify image", Toast.LENGTH_SHORT).show()
