@@ -50,6 +50,10 @@ class AuthViewModel(application: Application): AndroidViewModel(application) {
         return sharedPreferences.getString("user_email", null)
     }
 
+    fun getUserGender(): String? {
+        return sharedPreferences.getString("user_gender", null)
+    }
+
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
             val request = LoginRequest(email, password)

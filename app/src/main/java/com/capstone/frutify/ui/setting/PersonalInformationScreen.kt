@@ -38,15 +38,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.capstone.frutify.viewModel.AuthViewModel
 
 @Composable
 fun PersonalInformationScreen(
     onClickBack: () -> Unit
 ) {
 
+    val authViewModel: AuthViewModel = viewModel()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
@@ -145,7 +148,7 @@ fun PersonalInformationScreen(
                     },
                     placeholder = {
                         Text(
-                            text = "Ferdinan Sinaga",
+                            text = authViewModel.getUserName() ?: "",
                             fontSize = 14.sp
                         )
                     },
@@ -191,7 +194,7 @@ fun PersonalInformationScreen(
                     },
                     placeholder = {
                         Text(
-                            text = "male",
+                            text = authViewModel.getUserGender() ?: "",
                             fontSize = 14.sp
                         )
                     },
@@ -237,7 +240,7 @@ fun PersonalInformationScreen(
                     },
                     placeholder = {
                         Text(
-                            text = "ferdinan@gmail.com",
+                            text = authViewModel.getUserEmail() ?: "",
                             fontSize = 14.sp
                         )
                     },
@@ -286,7 +289,6 @@ fun PersonalInformationScreen(
                 )
             }
         }
-
     }
 }
 
