@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.capstone.frutify.ui.home.component.FruitData
+import com.capstone.frutify.model.ScanData
 import com.capstone.frutify.ui.home.component.HomeScreenHeader
 import com.capstone.frutify.ui.home.component.QuickScanOption
 import com.capstone.frutify.ui.home.component.RecentData
@@ -22,7 +22,7 @@ import com.capstone.frutify.ui.home.component.RecentData
 @Composable
 fun HomeScreen(
     onFruitSelected: (String) -> Unit,
-    onClickDetail: (FruitData) -> Unit
+    onClickDetail: (ScanData) -> Unit
 ) {
 
     Column(

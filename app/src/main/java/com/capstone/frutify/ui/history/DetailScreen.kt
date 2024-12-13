@@ -1,5 +1,6 @@
 package com.capstone.frutify.ui.history
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,24 +27,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.capstone.frutify.R
+import java.text.SimpleDateFormat
 
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun DetailScreen(
     image: String,
     title: String,
     date: String,
     weight: Double,
+    nutrition: String,
     onBackClicked: () -> Unit
 ) {
+    val formatedDate = SimpleDateFormat("dd MMM yyyy").format(SimpleDateFormat("yyyy-MM-dd").parse(date)!!)
     Scaffold(
         topBar = {
             Row(
@@ -91,10 +93,7 @@ fun DetailScreen(
                 .padding(16.dp)
         ){
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(image)
-                    .crossfade(true)
-                    .build(),
+                model = image,
                 contentScale = ContentScale.Crop,
                 contentDescription = title,
                 modifier = Modifier
@@ -148,13 +147,23 @@ fun DetailScreen(
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = date,
+                        text = formatedDate,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFF666666)
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(
+                text = nutrition,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFF666666),
+                lineHeight = 30.sp
+            )
         }
     }
 }

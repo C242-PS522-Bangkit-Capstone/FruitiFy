@@ -25,10 +25,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capstone.frutify.R
+import com.capstone.frutify.viewModel.AuthViewModel
 
 @Composable
 fun HomeScreenHeader() {
+    val authViewModel: AuthViewModel = viewModel()
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,7 +60,7 @@ fun HomeScreenHeader() {
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "Raihan Maulana",
+                    text = authViewModel.getUserName() ?: "",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White

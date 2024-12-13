@@ -10,51 +10,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.capstone.frutify.ui.home.component.FruitData
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.capstone.frutify.model.ScanData
 import com.capstone.frutify.ui.home.component.RecentDataCard
+import com.capstone.frutify.viewModel.ScanViewModel
 
 @Composable
 fun HistoryData(
-    onClickDetail: (FruitData) -> Unit
+    onClickDetail: (ScanData) -> Unit
 ) {
+    val scanViewModel: ScanViewModel = viewModel()
+    val listData by scanViewModel.scanData.observeAsState(emptyList())
 
-    val listData = listOf(
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Apple",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Pisang",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Semangka",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Jambu",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Mangga",
-            weight = 200.0,
-            date = "17 November 2024"
-        )
-    )
+    LaunchedEffect(Unit) {
+        scanViewModel.fetchScanData()
+    }
 
     Column(
         modifier = Modifier
@@ -75,10 +53,10 @@ fun HistoryData(
         ) {
             items(listData) {
                 RecentDataCard(
-                    image = it.image,
-                    title = it.title,
-                    date = it.date,
-                    weight = it.weight,
+                    image = it.fruit_image_url,
+                    title = it.fruit_name,
+                    date = it.scan_date,
+                    weight = it.fruit_weight.toDouble(),
                     onClickDetail = {
                         onClickDetail(it)
                     }

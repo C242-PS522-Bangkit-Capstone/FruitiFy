@@ -1,5 +1,7 @@
 package com.capstone.frutify.ui.home.component
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,65 +22,36 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.capstone.frutify.R
+import com.capstone.frutify.model.ScanData
+import com.capstone.frutify.viewModel.ScanViewModel
+import java.text.SimpleDateFormat
 
-data class FruitData(
-    val image: String,
-    val title: String,
-    val date: String,
-    val weight: Double
-)
 
 @Composable
 fun RecentData(
-    onClickDetail: (FruitData) -> Unit
+    onClickDetail: (ScanData) -> Unit
 ) {
+    val scanViewModel: ScanViewModel = viewModel()
+    val listData by scanViewModel.scanData.observeAsState(emptyList())
 
-    val listData = listOf(
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Pisang",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Pisang",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Pisang",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Pisang",
-            weight = 200.0,
-            date = "17 November 2024"
-        ),
-        FruitData(
-            image = "https://images.unsplash.com/photo-1531326240216-7b04ad593229?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            title = "Pisang",
-            weight = 200.0,
-            date = "17 November 2024"
-        )
-    )
+    LaunchedEffect(Unit) {
+        scanViewModel.fetchScanData()
+    }
 
     Column(
         modifier = Modifier
@@ -98,11 +71,12 @@ fun RecentData(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(listData) {
+                Log.d("Recent data", it.scan_date)
                 RecentDataCard(
-                    image = it.image,
-                    title = it.title,
-                    date = it.date,
-                    weight = it.weight,
+                    image = it.fruit_image_url,
+                    title = it.fruit_name,
+                    date = it.scan_date,
+                    weight = it.fruit_weight.toDouble(),
                     onClickDetail = {
                         onClickDetail(it)
                     }
@@ -113,6 +87,7 @@ fun RecentData(
 }
 
 
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun RecentDataCard(
     image: String,
@@ -121,6 +96,7 @@ fun RecentDataCard(
     weight: Double,
     onClickDetail: () -> Unit
 ){
+    val formatedDate = SimpleDateFormat("dd MMM yyyy").format(SimpleDateFormat("yyyy-MM-dd").parse(date)!!)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,17 +116,13 @@ fun RecentDataCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(image)
-                    .crossfade(true)
-                    .build(),
-                contentScale = ContentScale.Crop,
+                model = image,
                 contentDescription = title,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .size(70.dp)
+                    .size(70.dp),
             )
-            
             Column(
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier
@@ -199,7 +171,7 @@ fun RecentDataCard(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = date,
+                            text = formatedDate.toString(),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Light,
                             color = Color(0xFF666666)

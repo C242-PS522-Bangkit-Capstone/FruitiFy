@@ -2,9 +2,12 @@ package com.capstone.frutify.ui.home.scan
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,6 +27,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -30,7 +35,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +55,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capstone.frutify.R
+import com.capstone.frutify.data.NutritionInfo
+import com.capstone.frutify.viewModel.ScanViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun SaveScanResult(
@@ -56,10 +70,34 @@ fun SaveScanResult(
     onBackClicked: () -> Unit,
     onSaveResult: () -> Unit
 ){
-
+    val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.getDefault())
+    var scanDate by remember {
+        mutableStateOf(LocalDate.now().format(formatter))
+    }
     var fruitWeight by remember {
         mutableStateOf("")
     }
+    var nutritionInfo by remember {
+        mutableStateOf(
+            when (scanResult) {
+                "Fresh Apple" -> NutritionInfo.appleNutrition
+                "Fresh Banana" -> NutritionInfo.bananaNutrition
+                "Fresh Cucumber" -> NutritionInfo.cucumberNutrition
+                "Fresh Orange" -> NutritionInfo.orangeNutrition
+                "Fresh Peach" -> NutritionInfo.peachNutrition
+                "Fresh Pomegranate" -> NutritionInfo.pomegranateNutrition
+                "Fresh Strawberry" -> NutritionInfo.strawberryNutrition
+                "Fresh Tomato" -> NutritionInfo.tomatoNutrition
+                else -> "Nutrition information not available"
+            }
+        )
+    }
+    var isUploading by remember {
+        mutableStateOf(false)
+    }
+    val scanViewModel: ScanViewModel = viewModel()
+    val uploadStatus by scanViewModel.uploadStatus.observeAsState()
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
@@ -250,6 +288,25 @@ fun SaveScanResult(
                 )
             }
 
+            val adjustedNutritionInfo = if (fruitWeight.isNotEmpty()) {
+                val weight = fruitWeight.toDoubleOrNull() ?: 0.0
+                if (weight > 0) {
+                    val nutritionFactor = weight / 100.0
+                    nutritionInfo.replace("Calories: ", "Calories: ${52 * nutritionFactor} kcal | ")
+                        .replace("Carbs: ", "Carbs: ${14 * nutritionFactor} g | ")
+                        .replace("Fiber: ", "Fiber: ${2.4 * nutritionFactor} g | ")
+                        .replace("Sugar: ", "Sugar: ${10.4 * nutritionFactor} g | ")
+                        .replace("Protein: ", "Protein: ${0.3 * nutritionFactor} g | ")
+                        .replace("Fat: ", "Fat: ${0.2 * nutritionFactor} g | ")
+                        .replace("Vitamin C: ", "Vitamin C: ${4.6 * nutritionFactor} mg | ")
+                        .replace("Potassium: ", "Potassium: ${107 * nutritionFactor} mg")
+                } else {
+                    nutritionInfo
+                }
+            } else {
+                nutritionInfo
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -263,13 +320,14 @@ fun SaveScanResult(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
-                    value = fruitWeight,
+                    value = scanDate,
                     onValueChange = {
-                        fruitWeight = it
+                        scanDate = it
                     },
+                    readOnly = true,
                     placeholder = {
                         Text(
-                            text = "20 November 2024",
+                            text = scanDate,
                             fontSize = 14.sp
                         )
                     },
@@ -303,9 +361,32 @@ fun SaveScanResult(
                         .fillMaxWidth()
                 )
             }
+
+            if (isUploading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(align = Alignment.Center)
+                ) {
+                    CircularProgressIndicator(
+                        color = Color(0xFF5BB85B),
+                        modifier = Modifier.size(60.dp)
+                    )
+                }
+            }
+
             Button(
                 onClick = {
-                    onSaveResult()
+                    isUploading = true
+                    scanViewModel.uploadScanData(
+                        userId = 1,
+                        fruitName = scanResult,
+                        fruitCondition = scanResult,
+                        fruitWeight = fruitWeight.toDoubleOrNull() ?: 0.0,
+                        nutritionInfo = nutritionInfo,
+                        fileUri = Uri.parse(imageUri)
+                    )
+                    Log.d("Nutrition Info", nutritionInfo)
                 },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -322,6 +403,19 @@ fun SaveScanResult(
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+            }
+        }
+
+        LaunchedEffect(uploadStatus) {
+            uploadStatus?.let { result ->
+                result.onSuccess {
+                    isUploading = false
+                    Toast.makeText(context, "Upload Success: $it", Toast.LENGTH_SHORT).show()
+                    onSaveResult()
+                }.onFailure {
+                    isUploading = false
+                    Toast.makeText(context, "Upload Failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

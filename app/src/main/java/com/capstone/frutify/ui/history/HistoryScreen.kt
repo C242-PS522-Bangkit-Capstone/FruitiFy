@@ -9,12 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.capstone.frutify.model.ScanData
 import com.capstone.frutify.ui.history.component.CalendarView
-import com.capstone.frutify.ui.home.component.FruitData
 
 @Composable
 fun HistoryScreen(
-    onClickDetail: (FruitData) -> Unit
+    onClickDetail: (ScanData) -> Unit
 ) {
 
     Column(

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -44,9 +45,11 @@ import com.capstone.frutify.ui.setting.DeleteAccountScreen
 import com.capstone.frutify.ui.setting.LanguageScreen
 import com.capstone.frutify.ui.setting.PersonalInformationScreen
 import com.capstone.frutify.ui.setting.SettingScreen
+import com.capstone.frutify.viewModel.AuthViewModel
 
 @Composable
 fun FruitifyApp() {
+    val authViewModel: AuthViewModel = viewModel()
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -55,7 +58,11 @@ fun FruitifyApp() {
 
     val showBottomBar = currentRoute in listOf("home", "history", "setting")
 
-    val startDestination = "onboarding"
+    val startDestination = if (authViewModel.checkLoginStatus()) {
+        "home_screen"
+    } else {
+        "onboarding"
+    }
 
     Scaffold(
         bottomBar = {
@@ -98,30 +105,34 @@ fun FruitifyApp() {
                         },
                         onClickDetail = { item ->
                             navController.navigate(
-                                "detail_screen?image=${item.image}&title=${item.title}&date=${item.date}&weight=${item.weight}"
+                                "detail_screen?image=${item.fruit_image_url}&title=${item.fruit_name}&date=${item.scan_date}&weight=${item.fruit_weight}&nutrition=${item.nutrition_info}"
                             )
                         }
                     )
                 }
                 composable(
-                    route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}",
+                    route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}&nutrition={nutrition}",
                     arguments = listOf(
                         navArgument("image") { type = NavType.StringType },
                         navArgument("title") { type = NavType.StringType },
                         navArgument("date") { type = NavType.StringType },
-                        navArgument("weight") { type = NavType.FloatType }
+                        navArgument("weight") { type = NavType.FloatType },
+                        navArgument("nutrition") { type = NavType.StringType }
+
                     )
                 ) { backStackEntry ->
                     val image = backStackEntry.arguments?.getString("image") ?: ""
                     val title = backStackEntry.arguments?.getString("title") ?: ""
                     val date = backStackEntry.arguments?.getString("date") ?: ""
                     val weight = backStackEntry.arguments?.getFloat("weight") ?: 0.0f
+                    val nutrition = backStackEntry.arguments?.getString("nutrition") ?: ""
 
                     DetailScreen(
                         image = image,
                         title = title,
                         date = date,
                         weight = weight.toDouble(),
+                        nutrition = nutrition,
                         onBackClicked = {
                             navController.popBackStack(route = "home", inclusive = false)
                         }
@@ -186,6 +197,7 @@ fun FruitifyApp() {
                         },
                         onSaveResult = {
                             // Implementasi untuk menyimpan hasil
+                            navController.navigate("success_screen_scan")
                         }
                     )
                 }
@@ -205,32 +217,36 @@ fun FruitifyApp() {
                     HistoryScreen(
                         onClickDetail = { item ->
                             navController.navigate(
-                                "detail_screen?image=${item.image}&title=${item.title}&date=${item.date}&weight=${item.weight}"
+                                "detail_screen?image=${item.fruit_image_url}&title=${item.fruit_name}&date=${item.scan_date}&weight=${item.fruit_weight}&nutrition=${item.nutrition_info}"
                             )
                         }
                     )
                 }
                 composable(
-                    route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}",
+                    route = "detail_screen?image={image}&title={title}&date={date}&weight={weight}&nutrition={nutrition}",
                     arguments = listOf(
                         navArgument("image") { type = NavType.StringType },
                         navArgument("title") { type = NavType.StringType },
                         navArgument("date") { type = NavType.StringType },
-                        navArgument("weight") { type = NavType.FloatType }
+                        navArgument("weight") { type = NavType.FloatType },
+                        navArgument("nutrition") { type = NavType.StringType }
+
                     )
                 ) { backStackEntry ->
                     val image = backStackEntry.arguments?.getString("image") ?: ""
                     val title = backStackEntry.arguments?.getString("title") ?: ""
                     val date = backStackEntry.arguments?.getString("date") ?: ""
                     val weight = backStackEntry.arguments?.getFloat("weight") ?: 0.0f
+                    val nutrition = backStackEntry.arguments?.getString("nutrition") ?: ""
 
                     DetailScreen(
                         image = image,
                         title = title,
                         date = date,
                         weight = weight.toDouble(),
+                        nutrition = nutrition,
                         onBackClicked = {
-                            navController.popBackStack(route = "history", inclusive = false)
+                            navController.popBackStack(route = "home", inclusive = false)
                         }
                     )
                 }
