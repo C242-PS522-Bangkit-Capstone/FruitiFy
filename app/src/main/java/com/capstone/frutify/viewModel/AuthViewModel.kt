@@ -29,7 +29,6 @@ class AuthViewModel(application: Application): AndroidViewModel(application) {
     val registerState: LiveData<Result<RegisterResponse>> = _registerState
 
     fun saveLoginResponse(loginResponse: LoginResponse) {
-        // Pastikan untuk menyimpan data di thread yang aman, bukan di main thread
         sharedPreferences.edit()
             .putString("auth_token", loginResponse.token)
             .putString("user_name", loginResponse.name)
