@@ -2,7 +2,6 @@ package com.capstone.frutify.ui.home.scan
 
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -386,7 +385,6 @@ fun SaveScanResult(
                         nutritionInfo = nutritionInfo,
                         fileUri = Uri.parse(imageUri)
                     )
-                    Log.d("Nutrition Info", nutritionInfo)
                 },
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
