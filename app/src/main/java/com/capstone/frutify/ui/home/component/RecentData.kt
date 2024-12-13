@@ -1,7 +1,6 @@
 package com.capstone.frutify.ui.home.component
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -71,7 +70,6 @@ fun RecentData(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(listData) {
-                Log.d("Recent data", it.scan_date)
                 RecentDataCard(
                     image = it.fruit_image_url,
                     title = it.fruit_name,
